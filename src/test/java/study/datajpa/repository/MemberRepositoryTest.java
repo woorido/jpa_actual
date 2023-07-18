@@ -24,8 +24,10 @@ class MemberRepositoryTest {
 
     @BeforeEach
     void setup() {
-        memberA = new Member("memberA");
-        memberB = new Member("memberB");
+        memberA = new Member("memberA", 10);
+        memberB = new Member("memberB", 20);
+        memberRepository.save(memberA);
+        memberRepository.save(memberB);
     }
 
     @Test
@@ -38,8 +40,6 @@ class MemberRepositoryTest {
 
     @Test
     void CRUD() {
-        memberRepository.save(memberA);
-        memberRepository.save(memberB);
 
         //단건조회
         Member findMemberA = memberRepository.findById(memberA.getId()).orElse(null);
@@ -65,5 +65,36 @@ class MemberRepositoryTest {
         long deletedCount = memberRepository.count();
 
         assertThat(deletedCount).isEqualTo(0);
+    }
+
+    @Test
+    void findByUsernameAndAgeGreaterThan() {
+
+        Member findMember = memberRepository.findByUsernameAndAgeGreaterThan("memberB", 15).get(0);
+
+        assertThat(findMember).isEqualTo(memberB);
+
+        //https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#repositories.query-methods
+    }
+
+    @Test
+    void findTop2By() {
+        List<Member> members = memberRepository.findTop2By();
+
+        assertThat(members.size()).isEqualTo(2);
+    }
+
+    @Test
+    void testNamedQuery() {
+        Member findMember = memberRepository.findByUsername("memberA").get(0);
+
+        assertThat(findMember).isEqualTo(memberA);
+    }
+
+    @Test
+    void testQuery() {
+        Member findMember = memberRepository.findUser("memberA", 10).get(0);
+
+        assertThat(findMember).isEqualTo(memberA);
     }
 }
