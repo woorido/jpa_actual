@@ -13,6 +13,8 @@ import study.datajpa.dto.MemberDto;
 import study.datajpa.entity.Member;
 import study.datajpa.entity.Team;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +30,8 @@ class MemberRepositoryTest {
     MemberRepository memberRepository;
     @Autowired
     TeamRepository teamRepository;
+    @PersistenceContext
+    EntityManager entityManager;
 
     Member memberA;
     Member memberB;
@@ -172,6 +176,23 @@ class MemberRepositoryTest {
         assertThat(page.getTotalPages()).isEqualTo(2);
         assertThat(page.isFirst()).isTrue();
         assertThat(page.hasNext()).isTrue();
+    }
+
+    @Test
+    void bulkUpdate() {
+        memberRepository.save(new Member("member1", 10));
+        memberRepository.save(new Member("member2", 19));
+        memberRepository.save(new Member("member3", 30));
+        memberRepository.save(new Member("member4", 31));
+        memberRepository.save(new Member("member5", 40));
+
+        int resultCount = memberRepository.bulkAgePlus(30);
+
+        //bulk 연산은 영속성 컨텍스트를 거치지 않고 바로 디비에 적용되기 때문에 후에 로직을을 위해 영속성 컨텍스트를 flush & clear 해주는 것이 좋음 == clearAutomatically = true
+        //entityManager.flush();
+        //entityManager.clear();
+
+        assertThat(resultCount).isEqualTo(3);
     }
 
 }
