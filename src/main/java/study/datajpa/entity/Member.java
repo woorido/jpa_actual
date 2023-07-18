@@ -30,13 +30,6 @@ public class Member {
         }
     }
 
-    public Member(Long id, String username, int age, Team team) {
-        this.id = id;
-        this.username = username;
-        this.age = age;
-        this.team = team;
-    }
-
     public Member(String username) {
         this.username = username;
     }
@@ -57,6 +50,10 @@ public class Member {
 
     public Long getId() {
         return id;
+    }
+
+    public String getUsername() {
+        return username;
     }
 
     @Override
