@@ -40,8 +40,8 @@ class MemberRepositoryTest {
     void setup() {
         memberA = new Member("memberA", 10);
         memberB = new Member("memberB", 20);
-//        memberRepository.save(memberA);
-//        memberRepository.save(memberB);
+        memberRepository.save(memberA);
+        memberRepository.save(memberB);
     }
 
     @Test
@@ -196,29 +196,20 @@ class MemberRepositoryTest {
     }
 
     @Test
-    void fetchJoin() {
-        Team teamA = new Team("teamA");
-        Team teamB = new Team("teamB");
-        teamRepository.save(teamA);
-        teamRepository.save(teamB);
-
-        Member memberA = new Member("memberA", 10, teamA);
-        Member memberB = new Member("memberB", 10, teamB);
-        memberRepository.save(memberA);
-        memberRepository.save(memberB);
-
+    public void queryHint() {
         entityManager.flush();
         entityManager.clear();
 
-        List<Member> members = memberRepository.findMemberFetchJoin();
-//        List<Member> members = memberRepository.findAll();
-
-        for (Member member : members) {
-            System.out.println("member = " + member.getUsername());
-
-            System.out.println("member.getTeam().getClass() = " + member.getTeam().getClass());
-            System.out.println("member.getTeam().getName() = " + member.getTeam().getName());
-        }
+        Member findMember = memberRepository.findReadOnlyByUsername("memberA");
+        findMember.changeUsername("memberA123");
+        memberRepository.flush();
     }
-    
+
+    @Test
+    void lock() {
+        entityManager.flush();
+        entityManager.clear();
+
+        memberRepository.findLockByUsername("memberA");
+    }
 }
