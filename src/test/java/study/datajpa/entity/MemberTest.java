@@ -1,8 +1,10 @@
 package study.datajpa.entity;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import study.datajpa.repository.MemberRepository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -19,6 +21,9 @@ class MemberTest {
 
     @PersistenceContext
     EntityManager em;
+
+    @Autowired
+    MemberRepository memberRepository;
 
     @Test
     void name() {
@@ -44,5 +49,24 @@ class MemberTest {
         List<Member> members = em.createQuery("select m from Member m", Member.class).getResultList();
 
         assertThat(members).isEqualTo(Arrays.asList(member1, member2, member3, member4));
+    }
+
+    @Test
+    void JpaEventBaseEntity() throws Exception {
+        Member member = new Member("member1");
+        memberRepository.save(member); //@PrePersist
+
+        Thread.sleep(100);
+        member.changeUsername("member2");
+
+        em.flush(); //@PreUpdate
+        em.clear();
+
+        Member findMember = memberRepository.findById(member.getId()).orElse(null);
+
+        System.out.println("getCreatedDate = " + findMember.getCreatedDate());
+        System.out.println("getLastModifiedDate = " + findMember.getLastModifiedDate());
+        System.out.println("getCreatedBy = " + findMember.getCreatedBy());
+        System.out.println("getLastModifiedBy = " + findMember.getLastModifiedBy());
     }
 }
