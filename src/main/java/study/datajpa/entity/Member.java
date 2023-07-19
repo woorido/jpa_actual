@@ -9,6 +9,7 @@ import java.util.Objects;
 @ToString(of = {"id", "username", "age"})
 @NamedQuery(name = "Member.findByUsername",
         query = "select m from Member m where m.username = :username")
+@NamedEntityGraph(name = "Member.all", attributeNodes = @NamedAttributeNode("team"))
 public class Member {
 
     @Id
@@ -54,6 +55,10 @@ public class Member {
 
     public String getUsername() {
         return username;
+    }
+
+    public Team getTeam() {
+        return team;
     }
 
     @Override
